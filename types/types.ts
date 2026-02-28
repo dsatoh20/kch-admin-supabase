@@ -111,3 +111,15 @@ export type ClubTag = {
   created_at: string;
   updated_at: string;
 };
+
+export type IsVerified = {
+  id: number;
+  club_id: number;
+  created_at: string;
+}
+
+export type OnCarousel = {
+  id: number;
+  club_event_id: number;
+  created_at: string;
+}

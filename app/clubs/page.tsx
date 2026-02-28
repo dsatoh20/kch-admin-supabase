@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Undo2, ArrowUp, ArrowDown } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { getVerifiedClubIDs } from "./getIsVerified";
 
 async function ClubsData(sort: string, order: string) {
   const supabase = await createClient();
@@ -22,6 +23,13 @@ async function ClubsContent({ searchParams }: { searchParams: { [key: string]: s
   const sort = (searchkeys?.sort as string) || 'id';
   const order = (searchkeys?.order as string) || 'asc';
   const clubs = await ClubsData(sort, order);
+  const verifiedClubIds = await getVerifiedClubIDs() || [];
+
+  // clubsの各レコードにis_verifiedフィールドを追加
+  const clubsWithVerified = clubs?.map(club => ({
+    ...club,
+    is_verified: verifiedClubIds.some((vcid: { club_id: number }) => vcid.club_id === club.id)
+  }));
 
   return (
     <>
@@ -72,7 +80,7 @@ async function ClubsContent({ searchParams }: { searchParams: { [key: string]: s
           </TableHeader>
           <TableBody>
 
-          {clubs.map((club) => (
+          {clubsWithVerified?.map((club) => (
             <TableRow key={club.id}>
               <TableCell>{club.id}</TableCell>
               <TableCell>{club.name}</TableCell>

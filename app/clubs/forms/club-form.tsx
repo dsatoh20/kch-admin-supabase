@@ -16,7 +16,6 @@ export default function ClubForm({ club, clubAffiliations }: { club: Club | null
   const [uploading, setUploading] = useState(false)
   const [slug, setSlug] = useState<string | null>(null)
   const [name, setName] = useState<string | null>(null)
-  const [is_verified, setIsVerified] = useState<boolean>(false)
   const [profile_image_url, setProfileImageUrl] = useState<string | null>(null)
   const [club_affiliation_id, setClubAffiliationId] = useState<number | null>(null)
   const [founding_year, setFoundingYear] = useState<number | null>(null)
@@ -28,7 +27,6 @@ export default function ClubForm({ club, clubAffiliations }: { club: Club | null
     if (club) {
       setSlug(club.slug)
       setName(club.name)
-      setIsVerified(club.is_verified)
       setProfileImageUrl(club.profile_image_url)
       setClubAffiliationId(club.club_affiliation_id)
       setFoundingYear(club.founding_year)
@@ -80,13 +78,13 @@ export default function ClubForm({ club, clubAffiliations }: { club: Club | null
       return
     }
     // log payload for debugging
-    console.log('update payload', { slug, name, is_verified, profile_image_url, club_affiliation_id, founding_year, id: club?.id })
+    console.log('update payload', { slug, name, profile_image_url, club_affiliation_id, founding_year, id: club?.id })
     try {
       setLoading(true)
 
       const { error } = await supabase
         .from('clubs')
-        .update({ slug, name, is_verified, profile_image_url, club_affiliation_id, founding_year })
+        .update({ slug, name, profile_image_url, club_affiliation_id, founding_year })
         .eq('id', club.id) // club_idで更新対象を特定
         
       if (error) {
@@ -126,19 +124,6 @@ export default function ClubForm({ club, clubAffiliations }: { club: Club | null
               value={name || ''}
               onChange={(e) => setName(e.target.value)}
             />
-          </Field>
-          <Field orientation="horizontal">
-            <Checkbox
-              id="is_verified"
-              checked={is_verified || false}
-              onCheckedChange={(checked) => setIsVerified(checked===true)}
-            />
-            <FieldLabel
-              htmlFor="is_verified"
-              className="font-normal"
-            >
-              Is Verified
-            </FieldLabel>
           </Field>
           <Field>
             <FieldLabel htmlFor="profile_image_url">Profile Image</FieldLabel>

@@ -12,6 +12,7 @@ import Link from "next/link";
 import { Undo2 } from "lucide-react";
 import getClubAffiliation from "../getClubAffiliation";
 import getTags from "../getTags";
+import IsVerifiedForm from "../forms/is_verified-form";
 
 // slugにもとづいてレコードを取り出す
 async function getClub(slug: string): Promise<Club | null> {
@@ -34,6 +35,8 @@ async function ClubContent({params}: {params: Promise<{ slug: string }>}) {
         <div className="flex flex-col gap-4 justify-center items-center mb-8">
             <p className='text-lg mt-8'>サークル基本情報</p>
             <ClubForm club={club} clubAffiliations={clubAffiliations} />
+            <p className="text-lg mt-8">金沢サークルハブ公認</p>
+            <IsVerifiedForm club_id={club?.id || null} />
             <p className='text-lg mt-8'>サークル詳細情報</p>
             <ClubInfoForm club_id={club?.id || null} />
             <p className='text-lg mt-8'>サークルリンク</p>
