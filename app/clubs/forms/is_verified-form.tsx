@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
+import { FieldGroup, Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Checkbox } from '@/components/ui/checkbox'
 
 
@@ -107,6 +107,7 @@ export default function IsVerifiedForm({ club_id }: { club_id: number | null }) 
             >
               Is Verified
             </FieldLabel>
+            
           </Field>
 
           <Field>

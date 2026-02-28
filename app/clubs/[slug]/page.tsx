@@ -13,6 +13,7 @@ import { Undo2 } from "lucide-react";
 import getClubAffiliation from "../getClubAffiliation";
 import getTags from "../getTags";
 import IsVerifiedForm from "../forms/is_verified-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // slugにもとづいてレコードを取り出す
 async function getClub(slug: string): Promise<Club | null> {
@@ -32,19 +33,53 @@ async function ClubContent({params}: {params: Promise<{ slug: string }>}) {
     const clubAffiliations = await getClubAffiliation() || [];
     const tags: Tag[] = await getTags() || [];
     return(
-        <div className="flex flex-col gap-4 justify-center items-center mb-8">
-            <p className='text-lg mt-8'>サークル基本情報</p>
-            <ClubForm club={club} clubAffiliations={clubAffiliations} />
-            <p className="text-lg mt-8">金沢サークルハブ公認</p>
-            <IsVerifiedForm club_id={club?.id || null} />
-            <p className='text-lg mt-8'>サークル詳細情報</p>
-            <ClubInfoForm club_id={club?.id || null} />
-            <p className='text-lg mt-8'>サークルリンク</p>
-            <UrlsForm club_id={club?.id || null} />
-            <p className='text-lg mt-8'>サークル構成員</p>
-            <MemberCompositionForm club_id={club?.id || null} />
-            <p className='text-lg mt-8'>サークルタグ</p>
-            <ClubTagsForm club_id={club?.id || null} tags={tags} />
+        <div className="flex flex-col gap-4 justify-center items-center mb-8 pt-8">
+            <Tabs defaultValue="Clubs" className="grid-cols-3 md:grid-cols-6">
+                <TabsList className="">
+                    <TabsTrigger value="Clubs">基本情報</TabsTrigger>
+                    <TabsTrigger value="IsVerified">承認状況</TabsTrigger>
+                    <TabsTrigger value="ClubInfos">詳細情報</TabsTrigger>
+                    <TabsTrigger value="Urls">リンク</TabsTrigger>
+                    <TabsTrigger value="MemberComposition">メンバー構成</TabsTrigger>
+                    <TabsTrigger value="ClubTags">タグ</TabsTrigger>
+                </TabsList>
+                <TabsContent value="Clubs" className="">
+                    <div className="flex flex-col justify-center items-center gap-4">
+                    <p className='text-lg mt-8'>基本情報</p>
+                    <ClubForm club={club} clubAffiliations={clubAffiliations} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="IsVerified">
+                    <div className="flex flex-col justify-center items-center gap-4">
+                    <p className="text-lg mt-8">承認状況</p>
+                    <IsVerifiedForm club_id={club?.id || null} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="ClubInfos">
+                    <div className="flex flex-col justify-center items-center gap-4">
+                    <p className='text-lg mt-8'>詳細情報</p>
+                    <ClubInfoForm club_id={club?.id || null} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="Urls">
+                    <div className="flex flex-col justify-center items-center gap-4">
+                    <p className='text-lg mt-8'>リンク</p>
+                    <UrlsForm club_id={club?.id || null} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="MemberComposition">
+                    <div className="flex flex-col justify-center items-center gap-4">
+                    <p className='text-lg mt-8'>メンバー構成員</p>
+                    <MemberCompositionForm club_id={club?.id || null} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="ClubTags">
+                    <div className="flex flex-col justify-center items-center gap-4">
+                    <p className='text-lg mt-8'>サークルタグ</p>
+                    <ClubTagsForm club_id={club?.id || null} tags={tags} />
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }
