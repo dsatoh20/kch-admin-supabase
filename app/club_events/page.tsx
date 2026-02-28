@@ -5,6 +5,8 @@ import { AuthButton } from "@/components/auth-button";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Undo2 } from "lucide-react";
+import { get } from "http";
+import { getOnCarouselEventIDs } from "./getOnCarousel";
 
 // club_events一覧を取得
 async function getClubEvents() {
@@ -17,9 +19,17 @@ async function getClubEvents() {
 // 非同期コンポーネント
 async function EventsContent() {
   const club_events = await getClubEvents();
+  const on_carousel_event_ids = await getOnCarouselEventIDs() || [];
+
+  // club_eventsの各レコードにon_carouselフィールドを追加
+  const club_events_with_carousel = club_events?.map((event) => ({
+    ...event,
+    on_carousel: on_carousel_event_ids.some((id) => id.club_events_id === event.id),
+  })) || [];
+
   return(
     <>
-    {club_events && club_events.length > 0 ? 
+    {club_events_with_carousel && club_events_with_carousel.length > 0 ? 
         <div className="mx-auto p-4">
         <p className="text-lg mt-8 text-center">サークルイベント一覧</p>
         <Table className="w-full my-8">
@@ -37,7 +47,7 @@ async function EventsContent() {
           </TableHeader>
           <TableBody>
 
-          {club_events.map((club_event) => (
+          {club_events_with_carousel.map((club_event) => (
             <TableRow key={club_event.id}>
               <TableCell>{club_event.id}</TableCell>
               <TableCell>{club_event.club_name}</TableCell>

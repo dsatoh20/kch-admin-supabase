@@ -24,8 +24,7 @@ export default function ClubEventForm({ club_event }: { club_event: ClubEvent | 
   const [updated_at, setUpdatedAt] = useState<string | null>(null)
   const [image_url, setImageUrl] = useState<string | null>(null)
   const [url, setUrl] = useState<string | null>(null)
-  const [on_carousel, setOnCarousel] = useState<boolean>(false)
-
+  
   useEffect(() => {
     if (club_event) {
       setClubId(club_event.club_id)
@@ -39,7 +38,6 @@ export default function ClubEventForm({ club_event }: { club_event: ClubEvent | 
       setUpdatedAt(club_event.updated_at)
       setImageUrl(club_event.image_url)
       setUrl(club_event.url)
-      setOnCarousel(club_event.on_carousel)
     }
   }, [club_event])
 
@@ -49,13 +47,13 @@ export default function ClubEventForm({ club_event }: { club_event: ClubEvent | 
       return
     }
     // log payload for debugging
-    console.log('update payload', { club_id, club_name, date, start_time, end_time, location, description, image_url, url, on_carousel, id: club_event?.id })
+    console.log('update payload', { club_id, club_name, date, start_time, end_time, location, description, image_url, url, id: club_event?.id })
     try {
       setLoading(true)
 
       const { error } = await supabase
         .from('club_events')
-        .update({ club_name, date, start_time, end_time, location, description, image_url, url, on_carousel })
+        .update({ club_name, date, start_time, end_time, location, description, image_url, url })
         .eq('id', club_event.id) // club_event.idで更新対象を特定
         
       if (error) {
@@ -152,16 +150,7 @@ export default function ClubEventForm({ club_event }: { club_event: ClubEvent | 
                 onChange={(e) => setUrl(e.target.value)}
             />
           </Field>
-          <Field orientation="horizontal">
-            <Checkbox
-              id="on_carousel"
-              checked={on_carousel}
-              onCheckedChange={(checked) => setOnCarousel(checked === true)}
-            />
-            <FieldLabel htmlFor="on_carousel" className="font-normal">
-              Show on Carousel
-            </FieldLabel>
-          </Field>
+          
 
           <Field>
             <Button
