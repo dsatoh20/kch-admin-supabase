@@ -91,8 +91,9 @@ export type MemberComposition = {
 
 export type MemberCompositionBelonging = {
   id: number;
-  member_composition_id: number;
+  club_id: number;
   belonging_id: number;
+  headcount: number | null;
   created_at: string;
   updated_at: string;
 };

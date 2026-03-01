@@ -24,7 +24,7 @@ export default function ClubEventForm({ club_event }: { club_event: ClubEvent | 
   const [updated_at, setUpdatedAt] = useState<string | null>(null)
   const [image_url, setImageUrl] = useState<string | null>(null)
   const [url, setUrl] = useState<string | null>(null)
-  
+  const [uploading, setUploading] = useState(false)
   useEffect(() => {
     if (club_event) {
       setClubId(club_event.club_id)
@@ -40,6 +40,40 @@ export default function ClubEventForm({ club_event }: { club_event: ClubEvent | 
       setUrl(club_event.url)
     }
   }, [club_event])
+
+  async function handleImageUpload(file: File) {
+    if (!club_event?.id) {
+      alert('Club Event ID is not available. Please save the club first.');
+      return;
+    }
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${club_event.id}/event.${fileExt}`;
+
+      // 1. Upload the file with upsert:true to overwrite existing file
+      const { error: uploadError } = await supabase.storage
+        .from('club_events_images')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // 2. Get the public URL for the uploaded file
+      const { data: urlData } = supabase.storage
+        .from('club_events_images')
+        .getPublicUrl(filePath);
+
+      // 3. Update the state to show preview and save to DB later
+      setImageUrl(urlData.publicUrl);
+    } catch (error: any) {
+      console.error('Error uploading club event image:', error);
+      alert(`Error uploading image: ${error.message}`);
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function updateClubEvent() {
     if (!club_event?.id) {
@@ -133,13 +167,26 @@ export default function ClubEventForm({ club_event }: { club_event: ClubEvent | 
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="image_url">Image URL</FieldLabel>
+            <FieldLabel htmlFor="image_url">Event Image</FieldLabel>
+            {image_url && (
+              <div className="my-2">
+                <img src={image_url} alt="Adv Preview" className="w-32 h-32 object-cover rounded" />
+              </div>
+            )}
             <Input
               id="image_url"
-                type="url"
-                value={image_url || ''}
-                onChange={(e) => setImageUrl(e.target.value)}
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  await handleImageUpload(file);
+                }
+              }}
+              disabled={uploading}
             />
+            {uploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
+            <FieldDescription>Select a picture to upload.</FieldDescription>
           </Field>
           <Field>
             <FieldLabel htmlFor="url">Event URL</FieldLabel>

@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
 import ClubForm from "../forms/club-form";
-import type { Club, Tag } from '@/types/types';
+import type { Belonging, Club, Tag } from '@/types/types';
 import ClubInfoForm from "../forms/club_infos-form";
 import UrlsForm from "../forms/urls-form";
 import MemberCompositionForm from "../forms/member_composition-form";
@@ -14,6 +14,8 @@ import getClubAffiliation from "../getClubAffiliation";
 import getTags from "../getTags";
 import IsVerifiedForm from "../forms/is_verified-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MemberCompositionBelongingsForm from "../forms/member_composition_belongings-form";
+import getBelongings from "../getBelongings";
 
 // slugにもとづいてレコードを取り出す
 async function getClub(slug: string): Promise<Club | null> {
@@ -29,9 +31,16 @@ async function getClub(slug: string): Promise<Club | null> {
 // 非同期コンポーネント
 async function ClubContent({params}: {params: Promise<{ slug: string }>}) {
     const { slug } = await params;
-    const club = await getClub(slug);
-    const clubAffiliations = await getClubAffiliation() || [];
-    const tags: Tag[] = await getTags() || [];
+
+    const [club, clubAffiliationsData, tagsData, belongingsData] = await Promise.all([
+        getClub(slug),
+        getClubAffiliation(),
+        getTags(),
+        getBelongings()
+    ]);
+    const clubAffiliations = clubAffiliationsData || [];
+    const tags: Tag[] = tagsData || [];
+    const belongings: Belonging[] = belongingsData || [];
     return(
         <div className="flex flex-col gap-4 justify-center items-center mb-8 pt-8">
             <Tabs defaultValue="Clubs" className="grid-cols-3 md:grid-cols-6">
@@ -40,7 +49,8 @@ async function ClubContent({params}: {params: Promise<{ slug: string }>}) {
                     <TabsTrigger value="IsVerified">承認状況</TabsTrigger>
                     <TabsTrigger value="ClubInfos">詳細情報</TabsTrigger>
                     <TabsTrigger value="Urls">リンク</TabsTrigger>
-                    <TabsTrigger value="MemberComposition">メンバー構成</TabsTrigger>
+                    <TabsTrigger value="MemberComposition">メンバー構成1</TabsTrigger>
+                    <TabsTrigger value="MemberComposition2">メンバー構成2</TabsTrigger>
                     <TabsTrigger value="ClubTags">タグ</TabsTrigger>
                 </TabsList>
                 <TabsContent value="Clubs" className="">
@@ -69,10 +79,18 @@ async function ClubContent({params}: {params: Promise<{ slug: string }>}) {
                 </TabsContent>
                 <TabsContent value="MemberComposition">
                     <div className="flex flex-col justify-center items-center gap-4">
-                    <p className='text-lg mt-8'>メンバー構成員</p>
+                    <p className='text-lg mt-8'>メンバー構成1</p>
                     <MemberCompositionForm club_id={club?.id || null} />
                     </div>
                 </TabsContent>
+
+                <TabsContent value="MemberComposition2">
+                    <div className="flex flex-col justify-center items-center gap-4">
+                    <p className='text-lg mt-8'>メンバー構成2</p>
+                    <MemberCompositionBelongingsForm club_id={club?.id || null} belongings={belongings || null} />
+                    </div>
+                </TabsContent>
+
                 <TabsContent value="ClubTags">
                     <div className="flex flex-col justify-center items-center gap-4">
                     <p className='text-lg mt-8'>サークルタグ</p>
