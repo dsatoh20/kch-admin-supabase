@@ -9,7 +9,7 @@ import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Separator } from "@/components/ui/separator";
-import { Settings } from "lucide-react";
+import { Library, Settings } from "lucide-react";
 
 export default function Home() {
   return (
@@ -36,6 +36,8 @@ export default function Home() {
           <main className="flex-1 flex flex-col gap-6 px-4">
             <p className="">これは金沢サークルハブ管理者サイトです。団体代表者の方は<a className="text-blue-500 hover:underline" href="https://kanazawa-circle-hub.vercel.app/login" target="_blank" rel="noopener noreferrer">こちら</a>からお入りください。</p>
           </main>
+          <div className="flex flex-col gap-8">
+          <div className="flex items-center justify-center gap-2 text-center mt-4"><Library />メインコンテンツ</div>
           <div className="flex items-center justify-center gap-2 text-sm md:gap-4">
             <div className="flex flex-col gap-1">
               <span className="font-medium"><Link href={"/clubs"}>サークル</Link></span>
@@ -51,22 +53,23 @@ export default function Home() {
               </span>
             </div>
           </div>
-          <div className="flex flex-col gap-4">
+          </div>
+          <div className="flex flex-col gap-8">
           <div className="flex items-center justify-center gap-2 text-center mt-4"><Settings />設定</div>
-          <div className="flex items-center justify-center gap-2 text-sm md:gap-4 border rounded p-8">
+          <div className="flex items-center justify-center gap-2 text-sm md:gap-4">
             <div className="hidden flex-col gap-1 md:flex">
               <span className="font-medium"><Link href={"/tags"}>タグ</Link></span>
               <span className="text-muted-foreground text-xs">検索ページのタグ管理</span>
             </div>
             <Separator orientation="vertical" className="hidden md:block" />
             <div className="hidden flex-col gap-1 md:flex">
-              <span className="font-medium"><Link href={"/belongings"}>メンバー所属先</Link></span>
-              <span className="text-muted-foreground text-xs">サークル構成員の所属先管理</span>
+              <span className="font-medium"><Link href={"/affiliations"}>サークル所属先</Link></span>
+              <span className="text-muted-foreground text-xs">団体の所属先管理</span>
             </div>
             <Separator orientation="vertical" className="hidden md:block" />
             <div className="hidden flex-col gap-1 md:flex">
-              <span className="font-medium"><Link href={"/affilications"}>サークル所属先</Link></span>
-              <span className="text-muted-foreground text-xs">団体の所属先管理</span>
+              <span className="font-medium"><Link href={"/belongings"}>メンバー所属先</Link></span>
+              <span className="text-muted-foreground text-xs">サークル構成員の所属先管理</span>
             </div>
             
           </div>
