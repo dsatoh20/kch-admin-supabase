@@ -11,7 +11,6 @@ export type Club = {
   id: number;
   slug: string;
   name: string;
-  is_verified: boolean;
   profile_image_url: string | null;
   club_affiliation_id: number | null;
   founding_year: number | null;
@@ -60,7 +59,6 @@ export type ClubEvent = {
   updated_at: string;
   image_url: string | null;
   url: string | null;
-  on_carousel: boolean;
 };
 
 export type Belonging = {
