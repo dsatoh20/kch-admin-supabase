@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "金沢サークルハブ管理者サイト",
   description: "金沢サークルハブの管理者向けサイトです。",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 const geistSans = Geist({
