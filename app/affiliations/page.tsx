@@ -8,7 +8,7 @@ import { Undo2 } from "lucide-react";
 import DeleteAffiliationButton from "./deleteAffiliation-btn";
 import AddAffiliationForm from "./addAffiliation-form";
 
-// belongings
+// affiliationの一覧を表示するページ
 async function getAffiliations() {
   const supabase = await createClient();
   const { data: affiliations } = await supabase.from("club_affiliations").select();
@@ -16,7 +16,16 @@ async function getAffiliations() {
   return affiliations;
 }
 
-
+// affiliationごとの所属団体数を取得する
+async function getAffiliationCount(tagId: number) {
+    const supabase = await createClient();
+    const { count } = await supabase
+      .from("clubs")
+      .select("*", { count: "exact", head: true })
+      .eq("club_affiliation_id", tagId);
+  
+    return count || 0;
+}
 
 // 非同期コンポーネント
 async function AffiliationsContent() {
@@ -31,8 +40,8 @@ async function AffiliationsContent() {
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>ClubCount</TableHead>
               <TableHead>CreatedAt</TableHead>
-              <TableHead>UpdatedAt</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -42,8 +51,8 @@ async function AffiliationsContent() {
             <TableRow key={affiliation.id}>
               <TableCell>{affiliation.id}</TableCell>
               <TableCell>{affiliation.name}</TableCell>
+              <TableCell>{getAffiliationCount(affiliation.id)}</TableCell>
               <TableCell>{new Date(affiliation.created_at).toLocaleDateString()}</TableCell>
-              <TableCell>{new Date(affiliation.updated_at).toLocaleDateString()}</TableCell>
               <TableCell><DeleteAffiliationButton affiliationId={affiliation.id}/></TableCell>
             </TableRow>
           ))}
