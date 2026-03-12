@@ -134,9 +134,8 @@ export default function ClubInfoForm({ club_id }: { club_id: number | null }) {
           </Field>
           <Field>
             <FieldLabel htmlFor="record">Record</FieldLabel>
-            <Input
+            <Textarea
               id="record"
-              type="text"
               value={record || ''}
               onChange={(e) => setRecord(e.target.value)}
             />
