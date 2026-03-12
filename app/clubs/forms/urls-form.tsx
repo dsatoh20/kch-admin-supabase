@@ -15,6 +15,9 @@ export default function UrlsForm({ club_id }: { club_id: number | null }) {
   const [x, setX] = useState<string | null>(null)
   const [discord, setDiscord] = useState<string | null>(null)
   const [website, setWebsite] = useState<string | null>(null)
+  const [youtube, setYoutube] = useState<string | null>(null)
+  const [line, setLine] = useState<string | null>(null)
+  const [facebook, setFacebook] = useState<string | null>(null)
   const [created_at, setCreatedAt] = useState<string | null>(null)
   const [updated_at, setUpdatedAt] = useState<string | null>(null)
   
@@ -25,7 +28,7 @@ export default function UrlsForm({ club_id }: { club_id: number | null }) {
 
       const { data, error, status } = await supabase
         .from('urls')
-        .select(`instagram, x, discord, website, created_at, updated_at`)
+        .select(`instagram, x, discord, website, youtube, line, facebook, created_at, updated_at`)
         .eq('club_id', club_id)
         .single()
 
@@ -39,6 +42,9 @@ export default function UrlsForm({ club_id }: { club_id: number | null }) {
         setX(data.x)
         setDiscord(data.discord)
         setWebsite(data.website)
+        setYoutube(data.youtube)
+        setLine(data.line)
+        setFacebook(data.facebook)
         setCreatedAt(data.created_at)
         setUpdatedAt(data.updated_at)
       }
@@ -65,7 +71,10 @@ export default function UrlsForm({ club_id }: { club_id: number | null }) {
         instagram,
         x,
         discord,
-        website
+        website,
+        youtube,
+        line,
+        facebook
       })
       .eq('club_id', club_id) // club_idで更新対象を特定
       if (error) throw error
@@ -119,7 +128,33 @@ export default function UrlsForm({ club_id }: { club_id: number | null }) {
               onChange={(e) => setWebsite(e.target.value)}
             />
           </Field>
-
+          <Field>
+            <FieldLabel htmlFor="youtube">Youtube</FieldLabel>
+            <Input
+              id="youtube"
+              type="text"
+              value={youtube || ''}
+              onChange={(e) => setYoutube(e.target.value)}
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="line">Line</FieldLabel>
+            <Input
+              id="line"
+              type="text"
+              value={line || ''}
+              onChange={(e) => setLine(e.target.value)}
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="facebook">Facebook</FieldLabel>
+            <Input
+              id="facebook"
+              type="text"
+              value={facebook || ''}
+              onChange={(e) => setFacebook(e.target.value)}
+            />
+          </Field>
           <Field>
             <Button
               type="button"

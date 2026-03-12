@@ -42,6 +42,9 @@ export type Url = {
   x: string | null;
   discord: string | null;
   website: string | null;
+  youtube: string | null;
+  line: string | null;
+  facebook: string | null;
   created_at: string;
   updated_at: string;
 };
