@@ -8,31 +8,34 @@ import { Undo2 } from "lucide-react";
 import DeleteAffiliationButton from "./deleteAffiliation-btn";
 import AddAffiliationForm from "./addAffiliation-form";
 
-// affiliationの一覧を表示するページ
-async function getAffiliations() {
+// affiliationの一覧と、それぞれに紐づくclubの数を取得する
+async function getAffiliationsWithCount() {
   const supabase = await createClient();
-  const { data: affiliations } = await supabase.from("club_affiliations").select();
+  // `clubs(count)` という構文で関連するclubsテーブルの行数をカウントします。
+  // これを利用するには、Supabase上で`clubs.club_affiliation_id`から`club_affiliations.id`への
+  // 外部キーリレーションが設定されている必要があります。
+  const { data: affiliations, error } = await supabase
+    .from("club_affiliations")
+    .select("*, clubs(count)");
 
-  return affiliations;
-}
+  if (error) {
+    console.error("Error fetching affiliations with count:", error);
+    return [];
+  }
 
-// affiliationごとの所属団体数を取得する
-async function getAffiliationCount(tagId: number) {
-    const supabase = await createClient();
-    const { count } = await supabase
-      .from("clubs")
-      .select("*", { count: "exact", head: true })
-      .eq("club_affiliation_id", tagId);
-  
-    return count || 0;
+  // dataは { ..., clubs: [{ count: 10 }] } のような形になるため、扱いやすいように整形します。
+  return affiliations.map((aff) => ({
+    ...aff,
+    club_count: Array.isArray(aff.clubs) ? aff.clubs[0]?.count ?? 0 : 0,
+  }));
 }
 
 // 非同期コンポーネント
 async function AffiliationsContent() {
-  const affiliations = await getAffiliations();
+  const affiliationsWithCount = await getAffiliationsWithCount();
   return (
     <>
-    {affiliations && affiliations.length > 0 ? 
+    {affiliationsWithCount && affiliationsWithCount.length > 0 ? (
         <div className="mx-auto p-4">
         <p className="text-lg mt-8 text-center">構成員所属一覧</p>
         <Table className="w-full my-8">
@@ -47,11 +50,11 @@ async function AffiliationsContent() {
           </TableHeader>
           <TableBody>
 
-          {affiliations.map((affiliation) => (
+          {affiliationsWithCount.map((affiliation) => (
             <TableRow key={affiliation.id}>
               <TableCell>{affiliation.id}</TableCell>
               <TableCell>{affiliation.name}</TableCell>
-              <TableCell>{getAffiliationCount(affiliation.id)}</TableCell>
+              <TableCell>{affiliation.club_count}</TableCell>
               <TableCell>{new Date(affiliation.created_at).toLocaleDateString()}</TableCell>
               <TableCell><DeleteAffiliationButton affiliationId={affiliation.id}/></TableCell>
             </TableRow>
@@ -59,7 +62,7 @@ async function AffiliationsContent() {
           </TableBody>
         </Table>
         </div>
-       : (
+      ) : (
         <p>No affiliations found.</p>
       )}
     </>

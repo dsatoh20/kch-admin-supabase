@@ -5,27 +5,33 @@ import { AuthButton } from "@/components/auth-button";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Undo2 } from "lucide-react";
-import { get } from "http";
-import { getOnCarouselEventIDs } from "./getOnCarousel";
 
-// club_events一覧を取得
-async function getClubEvents() {
+// club_events一覧と、on_carouselの情報を結合して取得
+async function getClubEventsWithCarouselInfo() {
   const supabase = await createClient();
-  const { data: club_events } = await supabase.from("club_events").select();
+  // on_carouselテーブルとのリレーションを利用して、関連レコードの有無をチェックします。
+  // これには、Supabase上で on_carousel.club_events_id から club_events.id への
+  // 外部キーリレーションが設定されている必要があります。
+  const { data: club_events, error } = await supabase
+    .from("club_events")
+    .select("*, on_carousel(id)");
 
-  return club_events;
+  if (error) {
+    console.error("Error fetching club events with carousel info:", error);
+    return [];
+  }
+
+  // 取得したデータを整形します。
+  // dataは { ..., on_carousel: [{ id: 123 }] } または { ..., on_carousel: [] } のような形になります。
+  return club_events.map((event) => ({
+    ...event,
+    on_carousel: Array.isArray(event.on_carousel) && event.on_carousel.length > 0,
+  }));
 }
 
 // 非同期コンポーネント
 async function EventsContent() {
-  const club_events = await getClubEvents();
-  const on_carousel_event_ids = await getOnCarouselEventIDs() || [];
-
-  // club_eventsの各レコードにon_carouselフィールドを追加
-  const club_events_with_carousel = club_events?.map((event) => ({
-    ...event,
-    on_carousel: on_carousel_event_ids.some((id) => id.club_events_id === event.id),
-  })) || [];
+  const club_events_with_carousel = await getClubEventsWithCarouselInfo();
 
   return(
     <>
