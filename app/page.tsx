@@ -52,6 +52,13 @@ export default function Home() {
                 イベント情報の確認・編集、カルーセル広告の管理
               </span>
             </div>
+            <Separator orientation="vertical" />
+            <div className="flex flex-col gap-1">
+              <span className="font-medium"><Link href={"/requests"}>リクエスト</Link></span>
+              <span className="text-muted-foreground text-xs">
+                掲載リクエストの確認
+              </span>
+            </div>
           </div>
           </div>
           <div className="flex flex-col gap-8">
