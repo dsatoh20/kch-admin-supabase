@@ -9,23 +9,29 @@ import { Undo2 } from "lucide-react";
 // club_events一覧と、on_carouselの情報を結合して取得
 async function getClubEventsWithCarouselInfo() {
   const supabase = await createClient();
-  // on_carouselテーブルとのリレーションを利用して、関連レコードの有無をチェックします。
-  // これには、Supabase上で on_carousel.club_events_id から club_events.id への
-  // 外部キーリレーションが設定されている必要があります。
-  const { data: club_events, error } = await supabase
+  const { data: club_events, error: eventsError } = await supabase
     .from("club_events")
-    .select("*, on_carousel(id)");
+    .select("*");
 
-  if (error) {
-    console.error("Error fetching club events with carousel info:", error);
+  if (eventsError) {
+    console.error("Error fetching club events:", eventsError);
     return [];
   }
 
-  // 取得したデータを整形します。
-  // dataは { ..., on_carousel: [{ id: 123 }] } または { ..., on_carousel: [] } のような形になります。
+  const { data: carouselData, error: carouselError } = await supabase
+    .from("on_carousel")
+    .select("club_events_id");
+
+  if (carouselError) {
+    console.error("Error fetching on_carousel:", carouselError);
+    return [];
+  }
+
+  const carouselEventIds = new Set((carouselData ?? []).map((r) => r.club_events_id));
+
   return club_events.map((event) => ({
     ...event,
-    on_carousel: Array.isArray(event.on_carousel) && event.on_carousel.length > 0,
+    on_carousel: carouselEventIds.has(event.id),
   }));
 }
 

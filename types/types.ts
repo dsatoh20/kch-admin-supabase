@@ -122,6 +122,6 @@ export type IsVerified = {
 
 export type OnCarousel = {
   id: number;
-  club_event_id: number;
+  club_events_id: number;
   created_at: string;
 }
